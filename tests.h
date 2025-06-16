@@ -1,7 +1,11 @@
 // Created by lucas on 12/06/2025
 
-#ifndef TESTS_H
-#define TESTS_H
+// lucas, FYI there is a better way of doing:
+// #ifndef TESTS_H
+// #define TESTS_H
+// it is
+#pragma once
+// -- PN
 
 #include <cstdint>
 
@@ -14,4 +18,4 @@ class Tests {
     // Add members or methods here if needed later
 };
 
-#endif // TESTS_H
+//#endif // TESTS_H

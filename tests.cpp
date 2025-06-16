@@ -1,7 +1,7 @@
 // Created by lucas on 12/06/2025
 
 #include <iostream>
-#include "Tests.h"
+#include "tests.h"
 
 void printTestBoard(uint64_t wPawnBit, uint64_t wKnightBit, uint64_t wBishopBit,
                     uint64_t wRookBit, uint64_t wQueenBit, uint64_t wKingBit,
