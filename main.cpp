@@ -17,7 +17,7 @@ list<uint32_t> StoreCaptures;
 /* Bit 0–5	6	From Square	0 to 63
 Bit 6–11	6	To Square	0 to 63
 Bit 12–15	4	Move Type	0: quiet, 1: capture, 2: en passant, 3: castle, etc.
-Bit 16–19	4	Promotion Pie=ce	0: none, 1: queen, 2: rook, 3: bishop, 4: knight
+Bit 16–19	4	Promotion Piece	0: none, 1: queen, 2: rook, 3: bishop, 4: knight
 */
 
 unordered_map<string, int> MovePriority;
@@ -56,26 +56,85 @@ bool Evaluate(uint32_t Move) //true menas best and false means bad
 {
 
 }
-
+int GetFile(int GridPos)
+{
+    return (GridPos % 8) + 1;
+}
 void FindCapture()
 {
     list<uint32_t> PutCapture;
     list<int> PawnMoves={7,9};
-    uint32_t tempCaptureStore=0ULL;
+    list<int> KnightMoves={17, 10, -6, -15,-17, -10, 6, 15};
+    list<int> BishopMoveStepSize={-9,9,7,-7}; //use recursion for this kind of stuff
     for (int i=0;i<=63;i++)
     {
+        if (wBishopBit&(1ULL<<i))
+        {
+            list<int> DiffernceFileBishop={1,-1};
+            for (auto y:BishopMoveStepSize)
+            {
+                int z=i+y;
+                while (z>=0&&z<=63)
+                {
+                    if (BlackPieces&(1ULL<<i+y))
+                    {
+                        
+                    }
+                    if ((z + y) < 0 || (z + y) > 63) break;
+                    z += y;
+                }
+            }
+        }
         if (wKnightBit&(1ULL<<i)!=0ULL)
         {
-
+            list<int> DiffernceFileKnight={1,2,-1,-2};
+            for (auto ii:KnightMoves)
+            {
+                if (BlackPieces&(1ULL<<i)!=0ULL)
+                {
+                    if ((i+ii)>=0&&(i+ii)<=63)
+                    {
+                        for (auto iii:DiffernceFileKnight)
+                        {
+                            if (GetFile(abs((i+ii)))-GetFile(abs(i)==iii))
+                            {
+                                uint32_t WmoveKnight=0ULL;
+                                WmoveKnight |=(i&0x3F);
+                                WmoveKnight|=((i+ii)>>6)&0x3F;
+                                WmoveKnight|=(i<<12)&0x3F;
+                                WmoveKnight|=(i<<16)&0x3F;
+                                PutCapture.push_back(WmoveKnight);
+                            }
+                        }
+                    }
+                }
+            }
         }
-        if ((wPawnBit&(1ULL<<i))!=0ULL) // add promtion
+        if ((wPawnBit&(1ULL<<i))!=0ULL)//make promtoion more then  just gurrantee queen
         {
-
+            list<int> DiffernceFilePawn={1,-1};
+            for (auto ii:PawnMoves) {
+                if (BlackPieces&(1ULL<<(i+ii))!=0ULL)
+                {
+                    if (i+ii>0&&i+ii<=63)
+                    {
+                        for (auto iii:DiffernceFilePawn)
+                        {
+                            if (abs(GetFile(i+ii)-GetFile(i))==iii)
+                            {
+                                uint32_t WmovePawn =0ULL;
+                                WmovePawn |=(i&0x3F);
+                                WmovePawn |= ((i+ii)&0x3F)<<6;
+                                WmovePawn |=(1<<12);
+                                WmovePawn |=(1<<16);
+                                PutCapture.push_back(WmovePawn);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
-}
-void ValidPawn() {
-    
 }
 uint32_t MovePicker(int beta)//beta is just like minum for mvoe to be cosndiered strong
 {
